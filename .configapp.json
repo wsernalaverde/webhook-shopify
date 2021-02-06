@@ -1,0 +1,10 @@
+{
+  "shopify": {
+    "secret": ""
+  },
+  "runnea": {
+    "baseUrl": "",
+    "promocion": "",
+    "password": ""
+  }
+}
