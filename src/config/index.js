@@ -20,7 +20,7 @@ function findRcFile(directory = false) {
 }
 
 try {
-  const rcFilePath = findRcFile(process.env.EXITO_CONFIG)
+  const rcFilePath = findRcFile(process.env.RUNNEA_CONFIG)
 
   if (!rcFilePath) throw new Error('Error getting the configuration file .configapp.json in message module')
 

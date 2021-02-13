@@ -22,41 +22,44 @@ router.post('/webhooks/runnea', authMiddleware, async (req, res) => {
   const body = req.body
 
   const promocion = config.runnea.promocion
-  let emailCustomer = body.customer.email || body.email
   const password = config.runnea.password
 
   try {
-    // body.line_items.map(item=> {
-    //   console.log(item.title)
-    // })
+    let codePromocion = {}
 
-    // const getData = async () => {
-    //   return Promise.all(body.line_items.map(item=> {
-    //     console.log(item.title)
-    //   }))
-    // }
-    
-    // await sendData() 
-   
-    console.log(emailCustomer)
+    const sendData = async () => {
+      console.log(body.line_items)
+      return Promise.all(body.line_items.map(async item => {
+        if (item.title.indexOf('Inscripci') >= 0) {
 
-    if (!emailCustomer) {
-      throw Boom.notFound('Email not found or invalid')
+          let emailCustomer = item.properties.length > 0 ? item.properties.filter(item => item.name === 'email')[0].value : body.customer.email
+          let distance = item.properties.length > 0 ? item.properties.filter(item => item.name === 'Elige tu distancia')[0].value : ''
+          
+          if (!emailCustomer) {
+            throw Boom.notFound('Email not found or invalid')
+          }
+
+          console.log(emailCustomer)
+          console.log(distance)
+
+          let control = await MD5(promocion + emailCustomer + password)
+          control = control.toString()
+
+          console.log(control)
+
+          codePromocion = await Runnea.addOrder({
+            promocion,
+            email: emailCustomer,
+            control
+          })
+
+          console.log(codePromocion)
+        }
+      }))
     }
-
-    let control = await MD5(promocion + emailCustomer + password)
-    control = control.toString()
-
-    console.log(control)
-
-    let codePromocion = await Runnea.addOrder({
-      promocion,
-      email: emailCustomer,
-      control
-    })
-
-    console.log(codePromocion)
     
+    await sendData() 
+   
     response = {
       data: codePromocion,
       statusCode: 200
